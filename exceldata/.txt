@@ -1,0 +1,36 @@
+Relationship Between CPU Performance (perfo) and Predictors:
+1. McycTime:
+    * Negative relationship: As McycTime increases, the perfo tends to decrease. This suggests that higher machine cycle times (slower CPUs) are associated with lower performance.
+2. minMaiMem:
+    * Positive relationship: Higher minimum main memory is associated with higher performance. This indicates that systems with more base memory likely perform better.
+3. maxMaiMem:
+    * Positive relationship: As maximum main memory increases, performance improves, similar to minMaiMem.
+4. cachemem:
+    * Positive relationship: CPUs with larger cache memory tend to have better performance, highlighting the importance of cache in processing speed.
+5. minchan:
+    * Weak relationship: The number of minimum channels shows a subtle positive correlation with performance but is not very strong.
+6. maxchan:
+    * Weak relationship: Similar to minchan, the maximum number of channels shows a weak positive influence on performance.
+7. memRan:
+    * Positive relationship: Memory range (the difference between max and min memory) correlates positively with performance, indicating that systems capable of handling wider ranges of memory perform better.
+8. ChperMem:
+    * Negative or very weak relationship: The ratio of channels per memory does not show a strong or consistent trend with performance.
+
+Relationships Among Predictors:
+1. minMaiMem vs. maxMaiMem:
+    * Strong positive relationship: Machines with higher minimum memory also tend to have higher maximum memory.
+2. minchan vs. maxchan:
+    * Strong positive relationship: The minimum number of channels correlates strongly with the maximum, suggesting that these two measures often scale together.
+3. McycTime vs. cachemem:
+    * Negative relationship: Machines with higher machine cycle times tend to have smaller cache memory sizes, suggesting that older/slower machines also have less cache.
+4. cachemem vs. maxMaiMem:
+    * Positive relationship: Machines with larger cache memory also tend to have higher maximum main memory, indicating advanced architectures.
+5. memRan vs. maxMaiMem:
+    * Positive relationship: The memory range correlates strongly with the maximum main memory, as a wider range implies a higher maximum capacity.
+6. ChperMem vs. Other Variables:
+    * Weak or no clear relationship: The channels-per-memory ratio does not strongly correlate with most other predictors.
+
+Insights:
+* Performance Drivers: Variables like cachemem, maxMaiMem, and minMaiMem are strong predictors of CPU performance.
+* Collinearity: Variables such as minMaiMem and maxMaiMem or minchan and maxchan are highly correlated, suggesting potential multicollinearity in regression analysis.
+* Feature Prioritization: For performance prediction, memory and cache characteristics appear more critical than channel-related metrics.
