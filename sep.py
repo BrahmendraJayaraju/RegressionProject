@@ -1,3 +1,5 @@
+#this gives scatterplot matrix in  seperate graphs
+#
 import pandas as pd
 
 # Load the uploaded Excel file
