@@ -14,15 +14,15 @@ print("Sheet names:", sheet_names)
 df1 = data.parse(sheet_names[0])
 
 # Add new columns: Memory Range and Channels per Memory
-df1['MemRan'] = df1['maxMaiMem'] - df1['minMaiMem']
-df1['ChPerMem'] = df1['maxchan'] / df1['maxMaiMem']
+#df1['ChanEff'] = df1['maxchan'] - df1['minchan']
+df1['CacheCycleRatio'] = df1['cachemem'] / df1['McycTime']
 
 # Reorder columns to place the new columns before the 'performance' column
 columns = list(df1.columns)
 performance_index = columns.index('perfo')
 
 columns.remove('perfo') # Remove 'performance' from its current position
-columns.insert(columns.index('ChPerMem') + 1, 'perfo')
+columns.insert(columns.index('CacheCycleRatio') + 1, 'perfo')
 
 # Reassign the reordered columns to the DataFrame
 df1 = df1[columns]
@@ -48,7 +48,7 @@ import matplotlib.pyplot as plt
 # Define the columns for scatterplots
 columns_to_plot = [
  'McycTime', 'minMaiMem', 'maxMaiMem', 'cachemem',
- 'minchan', 'maxchan', 'MemRan', 'ChPerMem', 'perfo'
+ 'minchan', 'maxchan', 'CacheCycleRatio', 'perfo'
 ]
 
 # Loop through all possible pairs of columns to create scatterplots
