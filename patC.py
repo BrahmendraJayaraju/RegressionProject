@@ -282,10 +282,11 @@ import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+remaining_data_Model = remaining_data[predictors_Model].copy()  # Ensure no SettingWithCopyWarning
+remaining_data_Model['perfo'] = remaining_data['perfo']
 
-remaining_data_Model=remaining_data[predictors_Model]
 
-print("anirudg",remaining_data_Model)
+
 
 # assumption 1a residual vs fitted after
 # Step 2: Clean data (remove NaN or infinite values caused by transformations)
@@ -297,7 +298,7 @@ X_with_constant_Model= sm.add_constant(X_Model)
 
 # Fit the model using the already transformed and cleaned data
 y_transformed_Model= transformed_data_clean_Model['perfo']
-X_transformed_Model= transformed_data_clean_Model[predictors]
+X_transformed_Model= transformed_data_clean_Model[predictors_Model]
 X_transformed_with_const_Model= sm.add_constant(X_transformed_Model)
 
 model_Model= sm.OLS(y_transformed_Model, X_transformed_with_const_Model).fit()
@@ -401,7 +402,7 @@ cooks_d_Model, p_values_Model = influence_Model.cooks_distance
 
 
 
-print("da",X_transformed_with_const_Model)
+
 
 
 
@@ -461,3 +462,44 @@ plt.show()
 
 
 
+#QQ plot # Create a final QQ plot for the transformed response variable 'perfo'
+
+import scipy.stats as stats
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8, 6))
+stats.probplot(remaining_data_Model['perfo'], dist="norm", plot=plt)
+plt.title("QQ Plot for Transformed Response Variable (perfo)")
+plt.grid(True)
+plt.show()
+
+
+# Plot a histogram for the transformed response variable 'perfo'
+plt.figure(figsize=(8, 6))
+plt.hist(remaining_data_Model['perfo'], bins=15, edgecolor='black', alpha=0.7)
+plt.title("Histogram of Transformed Response Variable (perfo)")
+plt.xlabel("Transformed perfo")
+plt.ylabel("Frequency")
+plt.grid(axis='y', alpha=0.75)
+plt.show()
+
+
+#calculate the VIF
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+# Subset the data to include only the selected predictors
+
+selected_predictors_aic=remaining_data[predictors_Model].copy()
+selected_X = selected_predictors_aic[predictors_Model]
+
+# Add a constant column for VIF calculation
+selected_X_with_const = sm.add_constant(selected_X)
+
+# Calculate VIF for each predictor
+vif_data = pd.DataFrame()
+vif_data['Predictor'] = selected_X_with_const.columns
+vif_data['VIF'] = [variance_inflation_factor(selected_X_with_const.values, i)
+                   for i in range(selected_X_with_const.shape[1])]
+
+# Display the VIF values
+print(vif_data)
