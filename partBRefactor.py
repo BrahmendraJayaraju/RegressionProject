@@ -5,11 +5,10 @@ file_path = '/Users/brahmendrajayaraju/Desktop/Book1.xlsx'
 data = pd.read_excel(file_path)
 
 # Display the first few rows of the dataset to understand its structure
-#print(data.head())
+# print(data.head())
 
 # Calculate the CacheCycleRatio as cachemem / McycTime
 data['CacheCycleRatio'] = data['cachemem'] / data['McycTime']
-
 
 # Display all rows and columns
 pd.set_option('display.max_rows', None)  # Show all rows
@@ -67,7 +66,6 @@ for k, v in lambda_values.items():
 
 print(f"\nResponse variable lambda: {response_lambda}")
 
-
 import numpy as np
 
 # Apply the transformations as specified
@@ -83,16 +81,6 @@ transformed_data['maxchan'] = np.log(transformed_data['maxchan'])
 transformed_data['CacheCycleRatio'] = 1 / (transformed_data['CacheCycleRatio'] ** 2)
 transformed_data['perfo'] = 1 / np.sqrt(transformed_data['perfo'])
 
-
-
-# Provide a summary of the transformed data
-#summary = transformed_data.describe()
-#this is latest log transfored data
-
-#print("log transformed left ",transformed_data)
-
-
-
 import matplotlib.pyplot as plt
 
 # assumption 1a residual vs fitted after
@@ -101,7 +89,6 @@ transformed_data_clean = transformed_data.replace([np.inf, -np.inf], np.nan).dro
 predictors = ['McycTime', 'minMaiMem', 'maxMaiMem', 'cachemem', 'minchan', 'maxchan', 'CacheCycleRatio']
 X = transformed_data_clean[predictors]
 X_with_constant = sm.add_constant(X)
-
 
 # Fit the model using the already transformed and cleaned data
 y_transformed = transformed_data_clean['perfo']
@@ -125,15 +112,12 @@ plt.ylabel("Residuals")
 plt.grid(True)
 plt.show()
 
-
 model_transformed = sm.OLS(y_transformed, X_transformed_with_const).fit()
-#Get fitted values and residuals
+# Get fitted values and residuals
 fitted_values_transformed = model_transformed.fittedvalues
 residuals_transformed = model_transformed.resid
 
-
-
-#single last
+# single last
 # Fit a quadratic polynomial (U-shaped curve) to the residuals
 coeffs = np.polyfit(fitted_values_transformed, residuals_transformed, deg=2)
 poly_curve = np.poly1d(coeffs)
@@ -181,7 +165,6 @@ for predictor in predictors:
     plt.grid(True)
     plt.show()
 
-
 # Residuals vs Order plot
 plt.figure(figsize=(10, 6))
 
@@ -198,32 +181,18 @@ plt.grid(True)
 plt.legend()
 plt.show()
 
-
-
-
-
-
-
-
-
-
-#influential points
+# influential points
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-
-
 # Recompute the influence measures and Bonferroni p-values
 influence = model.get_influence()
 
 # Extract Cook's Distance
 cooks_d, p_values = influence.cooks_distance
-
-
-
 
 # Thresholds for diagnostics
 cooks_d_threshold = 4 / len(y_transformed)  # Typical Cook's Distance threshold
@@ -245,8 +214,10 @@ axes[0, 0].legend()
 # Plot 2: Standardized Residuals
 standardized_residuals = influence.resid_studentized_internal
 sns.scatterplot(x=np.arange(len(standardized_residuals)), y=standardized_residuals, ax=axes[0, 1], color='green')
-axes[0, 1].axhline(y=std_residuals_threshold, color='red', linestyle='--', label=f"Upper Threshold ({std_residuals_threshold})")
-axes[0, 1].axhline(y=-std_residuals_threshold, color='red', linestyle='--', label=f"Lower Threshold (-{std_residuals_threshold})")
+axes[0, 1].axhline(y=std_residuals_threshold, color='red', linestyle='--',
+                   label=f"Upper Threshold ({std_residuals_threshold})")
+axes[0, 1].axhline(y=-std_residuals_threshold, color='red', linestyle='--',
+                   label=f"Lower Threshold (-{std_residuals_threshold})")
 axes[0, 1].set_title('Standardized Residuals')
 axes[0, 1].set_xlabel('Index')
 axes[0, 1].set_ylabel('Standardized Residuals')
@@ -263,11 +234,8 @@ axes[1, 0].set_ylabel('Hat Values')
 axes[1, 0].grid(True)
 axes[1, 0].legend()
 
-
-
 # Correct Bonferroni p-values (for multiple comparisons)
 bonferroni_p_values = p_values
-
 
 # Plot 4: Bonferroni p-values
 sns.scatterplot(x=np.arange(len(bonferroni_p_values)), y=bonferroni_p_values, ax=axes[1, 1], color='purple')
@@ -279,11 +247,7 @@ axes[1, 1].grid(True)
 plt.tight_layout()
 plt.show()
 
-
-
-
-
-#this is after removing outliners
+# this is after removing outliners
 outliers = np.where(cooks_d > cooks_d_threshold)[0]  # Indices of outliers
 
 # Correctly remove outliers by their index values
@@ -292,38 +256,33 @@ outliers_data = transformed_data_clean.loc[outliers_indices]
 remaining_data = transformed_data_clean.drop(index=outliers_indices)
 
 # Display outliers and remaining data
-print("removed",outliers_data)
-#print(remaining_data)
+print("\nremoved outliers\n", outliers_data)
+# print(remaining_data)
 
 
 #  after removal of outliners again apply all 4 4
-y_transformed_out= remaining_data['perfo']
-X_transformed_out= remaining_data[predictors]
-X_transformed_with_const_out= sm.add_constant(X_transformed_out)
+y_transformed_out = remaining_data['perfo']
+X_transformed_out = remaining_data[predictors]
+X_transformed_with_const_out = sm.add_constant(X_transformed_out)
 
-
-
-model_out= sm.OLS(y_transformed_out, X_transformed_with_const_out).fit()
+model_out = sm.OLS(y_transformed_out, X_transformed_with_const_out).fit()
 # Recompute the influence measures and Bonferroni p-values
-influence_out= model_out.get_influence()
+influence_out = model_out.get_influence()
 
 # Extract Cook's Distance
-cooks_d_out, p_values_out= influence_out.cooks_distance
-
-
-
-
+cooks_d_out, p_values_out = influence_out.cooks_distance
 
 cooks_d_threshold_out = 4 / len(y_transformed_out)  # Typical Cook's Distance threshold
 std_residuals_threshold_out = 2  # Common threshold for standardized residuals
-leverage_threshold_out= 2 * (X_transformed_with_const_out.shape[1] / len(y_transformed_out))  # Leverage threshold
+leverage_threshold_out = 2 * (X_transformed_with_const_out.shape[1] / len(y_transformed_out))  # Leverage threshold
 
 # Re-plot diagnostic plots with corrected Bonferroni p-values
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
 # Plot 1: Cook's Distance
 sns.scatterplot(x=np.arange(len(cooks_d_out)), y=cooks_d_out, ax=axes[0, 0], color='blue')
-axes[0, 0].axhline(y=cooks_d_threshold_out, color='red', linestyle='--', label=f"Threshold ({cooks_d_threshold_out:.3f})")
+axes[0, 0].axhline(y=cooks_d_threshold_out, color='red', linestyle='--',
+                   label=f"Threshold ({cooks_d_threshold_out:.3f})")
 axes[0, 0].set_title("Cook's Distance")
 axes[0, 0].set_xlabel('Index')
 axes[0, 0].set_ylabel("Cook's Distance")
@@ -331,10 +290,13 @@ axes[0, 0].grid(True)
 axes[0, 0].legend()
 
 # Plot 2: Standardized Residuals
-standardized_residuals_out= influence_out.resid_studentized_internal
-sns.scatterplot(x=np.arange(len(standardized_residuals_out)), y=standardized_residuals_out, ax=axes[0, 1], color='green')
-axes[0, 1].axhline(y=std_residuals_threshold_out, color='red', linestyle='--', label=f"Upper Threshold ({std_residuals_threshold_out})")
-axes[0, 1].axhline(y=-std_residuals_threshold_out, color='red', linestyle='--', label=f"Lower Threshold (-{std_residuals_threshold_out})")
+standardized_residuals_out = influence_out.resid_studentized_internal
+sns.scatterplot(x=np.arange(len(standardized_residuals_out)), y=standardized_residuals_out, ax=axes[0, 1],
+                color='green')
+axes[0, 1].axhline(y=std_residuals_threshold_out, color='red', linestyle='--',
+                   label=f"Upper Threshold ({std_residuals_threshold_out})")
+axes[0, 1].axhline(y=-std_residuals_threshold_out, color='red', linestyle='--',
+                   label=f"Lower Threshold (-{std_residuals_threshold_out})")
 axes[0, 1].set_title('Standardized Residuals')
 axes[0, 1].set_xlabel('Index')
 axes[0, 1].set_ylabel('Standardized Residuals')
@@ -342,20 +304,18 @@ axes[0, 1].grid(True)
 axes[0, 1].legend(loc='lower right')
 
 # Plot 3: Hat Values (Leverage)
-hat_values_out= influence_out.hat_matrix_diag
+hat_values_out = influence_out.hat_matrix_diag
 sns.scatterplot(x=np.arange(len(hat_values_out)), y=hat_values_out, ax=axes[1, 0], color='red')
-axes[1, 0].axhline(y=leverage_threshold_out, color='blue', linestyle='--', label=f"Threshold ({leverage_threshold_out:.3f})")
+axes[1, 0].axhline(y=leverage_threshold_out, color='blue', linestyle='--',
+                   label=f"Threshold ({leverage_threshold_out:.3f})")
 axes[1, 0].set_title('Hat Values (Leverage)')
 axes[1, 0].set_xlabel('Index')
 axes[1, 0].set_ylabel('Hat Values')
 axes[1, 0].grid(True)
 axes[1, 0].legend()
 
-
-
 # Correct Bonferroni p-values (for multiple comparisons)
-bonferroni_p_values_out= p_values_out
-
+bonferroni_p_values_out = p_values_out
 
 # Plot 4: Bonferroni p-values
 sns.scatterplot(x=np.arange(len(bonferroni_p_values_out)), y=bonferroni_p_values_out, ax=axes[1, 1], color='purple')
@@ -367,8 +327,7 @@ axes[1, 1].grid(True)
 plt.tight_layout()
 plt.show()
 
-
-#QQ plot # Create a final QQ plot for the transformed response variable 'perfo'
+# QQ plot # Create a final QQ plot for the transformed response variable 'perfo'
 
 import scipy.stats as stats
 import matplotlib.pyplot as plt
@@ -379,7 +338,6 @@ plt.title("QQ Plot for Transformed Response Variable (perfo)")
 plt.grid(True)
 plt.show()
 
-
 # Plot a histogram for the transformed response variable 'perfo'
 plt.figure(figsize=(8, 6))
 plt.hist(remaining_data['perfo'], bins=15, edgecolor='black', alpha=0.7)
@@ -388,5 +346,3 @@ plt.xlabel("Transformed perfo")
 plt.ylabel("Frequency")
 plt.grid(axis='y', alpha=0.75)
 plt.show()
-
-
