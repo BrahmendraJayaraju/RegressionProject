@@ -310,13 +310,13 @@ fitted_values_Model = model_Model.fittedvalues
 residuals_Model = model_Model.resid
 
 # Plot Residuals vs Fitted values
-plt.figure(figsize=(10, 6))
-plt.scatter(fitted_values_Model, residuals_Model, alpha=0.7)
+plt.figure(figsize=(18, 10))
+plt.scatter(fitted_values_Model, residuals_Model, alpha=0.7,marker='x',color='purple')
 plt.axhline(y=0, color='red', linestyle='--')
 
-plt.title("Residuals vs Fitted Values (Transformed Data)")
-plt.xlabel("Fitted Values")
-plt.ylabel("Residuals")
+plt.title("Residuals vs Fitted Values (Transformed Data) model 1",fontsize=16, fontweight='bold')
+plt.xlabel("Fitted Values",fontsize=16, fontweight='bold')
+plt.ylabel("Residuals",fontsize=16, fontweight='bold')
 plt.grid(True)
 plt.show()
 
@@ -335,13 +335,13 @@ x_curve_Model = np.linspace(min(fitted_values_transformed_Model), max(fitted_val
 y_curve_Model = poly_curve_Model(x_curve_Model)
 
 # Plot Residuals vs. Fitted Values with U-shaped curve (quadratic)
-plt.figure(figsize=(10, 6))
-plt.scatter(fitted_values_transformed_Model, residuals_transformed_Model, alpha=0.7, label="Residuals")
-plt.plot(x_curve_Model, y_curve_Model, color='blue', label="Quadratic Curve (U-shaped)", linewidth=2)
+plt.figure(figsize=(18, 10))
+plt.scatter(fitted_values_transformed_Model, residuals_transformed_Model, alpha=0.7, label="Residuals",marker='x',color='purple')
+plt.plot(x_curve_Model, y_curve_Model, color='black', label="Quadratic Curve (U-shaped)", linewidth=2)
 plt.axhline(y=0, color='red', linestyle='--', label="Zero Line")
-plt.title("Residuals vs Fitted Values with U-Shaped Quadratic Curve")
-plt.xlabel("Fitted Values")
-plt.ylabel("Residuals")
+plt.title("Residuals vs Fitted Values with U-Shaped Quadratic Curve model1",fontsize=16, fontweight='bold')
+plt.xlabel("Fitted Values",fontsize=16, fontweight='bold')
+plt.ylabel("Residuals",fontsize=16, fontweight='bold')
 plt.legend()
 plt.grid(True)
 plt.show()
@@ -362,29 +362,29 @@ for predictor_Model in predictors_Model:
     y_curve_Model = poly_curve_Model(x_curve_Model)
 
     # Plot Residuals vs Predictor with U-shaped curve (quadratic)
-    plt.figure(figsize=(10, 6))
-    plt.scatter(predictor_values_Model, residuals_transformed_Model, alpha=0.7, label="Residuals")
-    plt.plot(x_curve_Model, y_curve_Model, color='blue', label="Quadratic Curve (U-shaped)", linewidth=2)
+    plt.figure(figsize=(18, 10))
+    plt.scatter(predictor_values_Model, residuals_transformed_Model, alpha=0.7, label="Residuals",marker='x',color='purple')
+    plt.plot(x_curve_Model, y_curve_Model, color='black', label="Quadratic Curve (U-shaped)", linewidth=2)
     plt.axhline(y=0, color='red', linestyle='--', label="Zero Line")
-    plt.title(f"Residuals vs {predictor_Model} with U-Shaped Quadratic Curve")
-    plt.xlabel(predictor_Model)
-    plt.ylabel("Residuals")
+    plt.title(f"Residuals vs {predictor_Model} with U-Shaped Quadratic Curve model 1",fontsize=16, fontweight='bold')
+    plt.xlabel("predictor_Model",fontsize=16, fontweight='bold')
+    plt.ylabel("Residuals",fontsize=16, fontweight='bold')
     plt.legend()
     plt.grid(True)
     plt.show()
 
 # Residuals vs Order plot
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(18, 10))
 
 # Order of residuals based on their index
 residual_order_Model = range(len(residuals_transformed_Model))
 
-plt.plot(residual_order_Model, residuals_transformed_Model, marker='o', linestyle='', alpha=0.7, label="Residuals")
+plt.plot(residual_order_Model, residuals_transformed_Model, linestyle='', alpha=0.7, label="Residuals",marker='x',color='purple')
 plt.axhline(y=0, color='red', linestyle='--', label="Zero Line")
 
-plt.title("Residuals vs Order")
-plt.xlabel("Order")
-plt.ylabel("Residuals")
+plt.title("Residuals vs Order model 1",fontsize=16, fontweight='bold')
+plt.xlabel("Order",fontsize=16, fontweight='bold')
+plt.ylabel("Residuals",fontsize=16, fontweight='bold')
 plt.grid(True)
 plt.legend()
 plt.show()
@@ -410,9 +410,9 @@ fig1, axes1 = plt.subplots(2, 2, figsize=(14, 10))
 sns.scatterplot(x=np.arange(len(cooks_d_Model)), y=cooks_d_Model, ax=axes1[0, 0], color='blue')
 axes1[0, 0].axhline(y=cooks_d_threshold_Model, color='red', linestyle='--',
                     label=f"Threshold ({cooks_d_threshold_Model:.3f})")
-axes1[0, 0].set_title("Cook's Distance")
-axes1[0, 0].set_xlabel('Index')
-axes1[0, 0].set_ylabel("Cook's Distance")
+axes1[0, 0].set_title("Cook's Distance model 1",fontsize=16, fontweight='bold')
+axes1[0, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
+axes1[0, 0].set_ylabel("Cook's Distance",fontsize=16, fontweight='bold')
 axes1[0, 0].grid(True)
 axes1[0, 0].legend()
 
@@ -424,20 +424,20 @@ axes1[0, 1].axhline(y=std_residuals_threshold_Model, color='red', linestyle='--'
                     label=f"Upper Threshold ({std_residuals_threshold_Model})")
 axes1[0, 1].axhline(y=-std_residuals_threshold_Model, color='red', linestyle='--',
                     label=f"Lower Threshold (-{std_residuals_threshold_Model})")
-axes1[0, 1].set_title('Standardized Residuals')
-axes1[0, 1].set_xlabel('Index')
-axes1[0, 1].set_ylabel('Standardized Residuals')
+axes1[0, 1].set_title('Standardized Residuals model 1',fontsize=16, fontweight='bold')
+axes1[0, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
+axes1[0, 1].set_ylabel('Standardized Residuals',fontsize=16, fontweight='bold')
 axes1[0, 1].grid(True)
 axes1[0, 1].legend(loc='lower right')
 
 # Plot 3: Hat Values (Leverage)
 hat_values_Model = influence_Model.hat_matrix_diag
 sns.scatterplot(x=np.arange(len(hat_values_Model)), y=hat_values_Model, ax=axes1[1, 0], color='red')
-axes1[1, 0].axhline(y=leverage_threshold_Model, color='blue', linestyle='--',
+axes1[1, 0].axhline(y=leverage_threshold_Model, color='orange', linestyle='--',
                     label=f"Threshold ({leverage_threshold_Model:.3f})")
-axes1[1, 0].set_title('Hat Values (Leverage)')
-axes1[1, 0].set_xlabel('Index')
-axes1[1, 0].set_ylabel('Hat Values')
+axes1[1, 0].set_title('Hat Values (Leverage) model 1',fontsize=16, fontweight='bold')
+axes1[1, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
+axes1[1, 0].set_ylabel('Hat Values',fontsize=16, fontweight='bold')
 axes1[1, 0].grid(True)
 axes1[1, 0].legend()
 
@@ -448,9 +448,9 @@ bonferroni_p_values_Model = p_values_Model
 sns.scatterplot(x=np.arange(len(bonferroni_p_values_Model)), y=bonferroni_p_values_Model, ax=axes1[1, 1],
                 color='purple')
 
-axes1[1, 1].set_title('Bonferroni p-values')
-axes1[1, 1].set_xlabel('Index')
-axes1[1, 1].set_ylabel('Bonferroni p-value')
+axes1[1, 1].set_title('Bonferroni p-values model 1',fontsize=16, fontweight='bold')
+axes1[1, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
+axes1[1, 1].set_ylabel('Bonferroni p-value',fontsize=16, fontweight='bold')
 axes1[1, 1].grid(True)
 plt.tight_layout()
 plt.show()
@@ -460,18 +460,33 @@ plt.show()
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-plt.figure(figsize=(8, 6))
-stats.probplot(remaining_data_Model['perfo'], dist="norm", plot=plt)
-plt.title("QQ Plot for Transformed Response Variable (perfo)")
+
+
+plt.figure(figsize=(18, 10))
+res = stats.probplot(remaining_data_Model['perfo'], dist="norm")
+# Plot the scatter points with 'x' markers
+plt.scatter(res[0][0], res[0][1], marker='x', color='purple', label='Data Points')
+# Plot the regression line in black
+plt.plot(res[0][0], res[1][0] * res[0][0] + res[1][1], color='black', label='Regression Line')
+# Customize titles and labels
+plt.title("QQ Plot for Transformed Response Variable (perfo) model 1", fontsize=16, fontweight='bold')
+plt.xlabel("Theoretical Quantiles", fontsize=16, fontweight='bold')
+plt.ylabel("Sample Quantiles", fontsize=16, fontweight='bold')
+# Add grid and legend
 plt.grid(True)
+plt.legend(fontsize=12)
 plt.show()
 
+
+
+
+
 # Plot a histogram for the transformed response variable 'perfo'
-plt.figure(figsize=(8, 6))
-plt.hist(remaining_data_Model['perfo'], bins=15, edgecolor='black', alpha=0.7)
-plt.title("Histogram of Transformed Response Variable (perfo)")
-plt.xlabel("Transformed perfo")
-plt.ylabel("Frequency")
+plt.figure(figsize=(18, 10))
+plt.hist(remaining_data_Model['perfo'], color='purple',bins=15, edgecolor='black', alpha=0.7)
+plt.title("Histogram of Transformed Response Variable (perfo) model 1",fontsize=16, fontweight='bold')
+plt.xlabel("Transformed perfo",fontsize=16, fontweight='bold')
+plt.ylabel("Frequency",fontsize=16, fontweight='bold')
 plt.grid(axis='y', alpha=0.75)
 plt.show()
 
