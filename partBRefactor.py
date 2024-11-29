@@ -81,17 +81,34 @@ transformed_data['maxchan'] = np.log(transformed_data['maxchan'])
 transformed_data['CacheCycleRatio'] = 1 / (transformed_data['CacheCycleRatio'] ** 2)
 transformed_data['perfo'] = 1 / np.sqrt(transformed_data['perfo'])
 
+
+
+
+transformed_data.rename(columns={
+    'McycTime': 'Log(McycTime)',
+    'minMaiMem': 'Log(minMaiMem)',
+    'maxMaiMem': 'Log(maxMaiMem)',
+    'cachemem': 'Log(cachemem)',
+    'minchan': 'Inv(Sqrt(minchan))',
+    'maxchan': 'Log(maxchan)',
+    'CacheCycleRatio': 'Inv(Sq(CacheCycleRatio))',
+    'perfo': 'Inv(Sqrt(perfo))'
+}, inplace=True)
+
+print(transformed_data.columns)
+
+
 import matplotlib.pyplot as plt
 
 # assumption 1a residual vs fitted after
 # Step 2: Clean data (remove NaN or infinite values caused by transformations)
 transformed_data_clean = transformed_data.replace([np.inf, -np.inf], np.nan).dropna()
-predictors = ['McycTime', 'minMaiMem', 'maxMaiMem', 'cachemem', 'minchan', 'maxchan', 'CacheCycleRatio']
+predictors = ['Log(McycTime)', 'Log(minMaiMem)', 'Log(maxMaiMem)', 'Log(cachemem)', 'Inv(Sqrt(minchan))', 'Log(maxchan)', 'Inv(Sq(CacheCycleRatio))']
 X = transformed_data_clean[predictors]
 X_with_constant = sm.add_constant(X)
 
 # Fit the model using the already transformed and cleaned data
-y_transformed = transformed_data_clean['perfo']
+y_transformed = transformed_data_clean['Inv(Sqrt(perfo))']
 X_transformed = transformed_data_clean[predictors]
 X_transformed_with_const = sm.add_constant(X_transformed)
 
@@ -205,8 +222,8 @@ fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 sns.scatterplot(x=np.arange(len(cooks_d)), y=cooks_d, ax=axes[0, 0], color='blue')
 axes[0, 0].axhline(y=cooks_d_threshold, color='red', linestyle='--', label=f"Threshold ({cooks_d_threshold:.3f})")
 axes[0, 0].set_title("Cook's Distance",fontsize=16, fontweight='bold')
-axes[0, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[0, 0].set_ylabel("Cook's Distance",fontsize=16, fontweight='bold')
+axes[0, 0].set_xlabel('Index',fontsize=16)
+axes[0, 0].set_ylabel("Cook's Distance",fontsize=16)
 axes[0, 0].grid(True)
 axes[0, 0].legend()
 
@@ -218,8 +235,8 @@ axes[0, 1].axhline(y=std_residuals_threshold, color='red', linestyle='--',
 axes[0, 1].axhline(y=-std_residuals_threshold, color='red', linestyle='--',
                    label=f"Lower Threshold (-{std_residuals_threshold})")
 axes[0, 1].set_title('Standardized Residuals',fontsize=16, fontweight='bold')
-axes[0, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[0, 1].set_ylabel('Standardized Residuals',fontsize=16, fontweight='bold')
+axes[0, 1].set_xlabel('Index',fontsize=16)
+axes[0, 1].set_ylabel('Standardized Residuals',fontsize=16)
 axes[0, 1].grid(True)
 axes[0, 1].legend(loc='lower right')
 
@@ -228,8 +245,8 @@ hat_values = influence.hat_matrix_diag
 sns.scatterplot(x=np.arange(len(hat_values)), y=hat_values, ax=axes[1, 0],color='orange')
 axes[1, 0].axhline(y=leverage_threshold, color='red', linestyle='--', label=f"Threshold ({leverage_threshold:.3f})")
 axes[1, 0].set_title('Hat Values (Leverage)',fontsize=16, fontweight='bold')
-axes[1, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[1, 0].set_ylabel('Hat Values',fontsize=16, fontweight='bold')
+axes[1, 0].set_xlabel('Index',fontsize=16)
+axes[1, 0].set_ylabel('Hat Values',fontsize=16)
 axes[1, 0].grid(True)
 axes[1, 0].legend()
 
@@ -240,8 +257,8 @@ bonferroni_p_values = p_values
 sns.scatterplot(x=np.arange(len(bonferroni_p_values)), y=bonferroni_p_values, ax=axes[1, 1], color='purple')
 
 axes[1, 1].set_title('Bonferroni p-values',fontsize=16, fontweight='bold')
-axes[1, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[1, 1].set_ylabel('Bonferroni p-value',fontsize=16, fontweight='bold')
+axes[1, 1].set_xlabel('Index',fontsize=16)
+axes[1, 1].set_ylabel('Bonferroni p-value',fontsize=16)
 axes[1, 1].grid(True)
 plt.tight_layout()
 plt.show()
@@ -260,7 +277,7 @@ print("\nremoved outliers\n", outliers_data)
 
 
 #  after removal of outliners again apply all 4 4
-y_transformed_out = remaining_data['perfo']
+y_transformed_out = remaining_data['Inv(Sqrt(perfo))']
 X_transformed_out = remaining_data[predictors]
 X_transformed_with_const_out = sm.add_constant(X_transformed_out)
 
@@ -283,8 +300,8 @@ sns.scatterplot(x=np.arange(len(cooks_d_out)), y=cooks_d_out, ax=axes[0, 0], col
 axes[0, 0].axhline(y=cooks_d_threshold_out, color='red', linestyle='--',
                    label=f"Threshold ({cooks_d_threshold_out:.3f})")
 axes[0, 0].set_title("Cook's Distance",fontsize=16, fontweight='bold')
-axes[0, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[0, 0].set_ylabel("Cook's Distance",fontsize=16, fontweight='bold')
+axes[0, 0].set_xlabel('Index',fontsize=16)
+axes[0, 0].set_ylabel("Cook's Distance",fontsize=16)
 axes[0, 0].grid(True)
 axes[0, 0].legend()
 
@@ -297,8 +314,8 @@ axes[0, 1].axhline(y=std_residuals_threshold_out, color='red', linestyle='--',
 axes[0, 1].axhline(y=-std_residuals_threshold_out, color='red', linestyle='--',
                    label=f"Lower Threshold (-{std_residuals_threshold_out})")
 axes[0, 1].set_title('Standardized Residuals',fontsize=16, fontweight='bold')
-axes[0, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[0, 1].set_ylabel('Standardized Residuals',fontsize=16, fontweight='bold')
+axes[0, 1].set_xlabel('Index',fontsize=16)
+axes[0, 1].set_ylabel('Standardized Residuals',fontsize=16)
 axes[0, 1].grid(True)
 axes[0, 1].legend(loc='lower right')
 
@@ -308,8 +325,8 @@ sns.scatterplot(x=np.arange(len(hat_values_out)), y=hat_values_out, ax=axes[1, 0
 axes[1, 0].axhline(y=leverage_threshold_out, color='red', linestyle='--',
                    label=f"Threshold ({leverage_threshold_out:.3f})")
 axes[1, 0].set_title('Hat Values (Leverage)',fontsize=16, fontweight='bold')
-axes[1, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[1, 0].set_ylabel('Hat Values',fontsize=16, fontweight='bold')
+axes[1, 0].set_xlabel('Index',fontsize=16)
+axes[1, 0].set_ylabel('Hat Values',fontsize=16)
 axes[1, 0].grid(True)
 axes[1, 0].legend()
 
@@ -320,8 +337,8 @@ bonferroni_p_values_out = p_values_out
 sns.scatterplot(x=np.arange(len(bonferroni_p_values_out)), y=bonferroni_p_values_out, ax=axes[1, 1], color='purple')
 
 axes[1, 1].set_title('Bonferroni p-values',fontsize=16, fontweight='bold')
-axes[1, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[1, 1].set_ylabel('Bonferroni p-value',fontsize=16, fontweight='bold')
+axes[1, 1].set_xlabel('Index',fontsize=16)
+axes[1, 1].set_ylabel('Bonferroni p-value',fontsize=16)
 axes[1, 1].grid(True)
 plt.tight_layout()
 plt.show()
@@ -333,13 +350,13 @@ import matplotlib.pyplot as plt
 
 # Create QQ plot
 plt.figure(figsize=(18, 10))
-res = stats.probplot(remaining_data['perfo'], dist="norm")
+res = stats.probplot(remaining_data['Inv(Sqrt(perfo))'], dist="norm")
 # Plot the scatter points with 'x' markers
 plt.scatter(res[0][0], res[0][1], marker='x', color='purple', label='Data Points')
 # Plot the regression line in black
 plt.plot(res[0][0], res[1][0] * res[0][0] + res[1][1], color='black', label='Regression Line')
 # Customize titles and labels
-plt.title("QQ Plot for Transformed Response Variable (perfo)", fontsize=16, fontweight='bold')
+plt.title("QQ Plot for Transformed Response Variable ('Inv(Sqrt(perfo))')", fontsize=16, fontweight='bold')
 plt.xlabel("Theoretical Quantiles", fontsize=16, fontweight='bold')
 plt.ylabel("Sample Quantiles", fontsize=16, fontweight='bold')
 # Add grid and legend
@@ -349,8 +366,8 @@ plt.show()
 
 # Plot a histogram for the transformed response variable 'perfo'
 plt.figure(figsize=(18, 10))
-plt.hist(remaining_data['perfo'], bins=15,color='purple', edgecolor='black', alpha=0.7)
-plt.title("Histogram of Transformed Response Variable (perfo)",fontsize=16, fontweight='bold')
+plt.hist(remaining_data['Inv(Sqrt(perfo))'], bins=15,color='purple', edgecolor='black', alpha=0.7)
+plt.title("Histogram of Transformed Response Variable ('Inv(Sqrt(perfo))')",fontsize=16, fontweight='bold')
 plt.xlabel("Transformed perfo",fontsize=16, fontweight='bold')
 plt.ylabel("Frequency",fontsize=16, fontweight='bold')
 plt.grid(axis='y', alpha=0.75)

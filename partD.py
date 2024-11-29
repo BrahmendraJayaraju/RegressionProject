@@ -7,11 +7,23 @@ import statsmodels.formula.api as smf
 # Load the data
 data = remaining_data_Model
 # Define the response and predictors
-response = 'perfo'
-predictors = ['McycTime', 'minMaiMem', 'maxMaiMem', 'cachemem', 'maxchan']
+response = 'Inv_Sqrt_perfo'
+predictors = ['Log_McycTime', 'Log_minMaiMem', 'Log_maxMaiMem', 'Log_cachemem', 'Log_maxchan']
 # Construct the formula for regression
-formula = f"{response} ~ {' + '.join(predictors)}"
 
+remaining_data_Model = remaining_data_Model.rename(columns={
+    "Log(McycTime)": "Log_McycTime",
+    "Log(minMaiMem)": "Log_minMaiMem",
+    "Log(maxMaiMem)": "Log_maxMaiMem",
+    "Log(cachemem)": "Log_cachemem",
+    "Log(maxchan)": "Log_maxchan",
+    "Inv(Sqrt(perfo))": "Inv_Sqrt_perfo"
+})
+
+formula =f"{response} ~ {' + '.join(predictors)}"
+
+print(remaining_data_Model)
+print(formula)
 # Fit the model
 model = smf.ols(formula=formula, data=remaining_data_Model).fit()
 
@@ -43,8 +55,8 @@ axes = axes.flatten()
 for i, predictor in enumerate(predictors):
     sm.graphics.plot_ccpr(model, predictor, ax=axes[i])
     axes[i].set_title(f"Effect Plot for -Model 1 {predictor}",fontsize=16, fontweight='bold')
-    axes[i].set_xlabel(predictor,fontsize=16, fontweight='bold')
-    axes[i].set_ylabel(response,fontsize=16, fontweight='bold')
+    axes[i].set_xlabel(predictor,fontsize=16)
+    axes[i].set_ylabel(response,fontsize=16)
 
 # Turn off unused subplots
 for j in range(len(predictors), len(axes)):
@@ -66,7 +78,3 @@ interpretation = {
                       "that is explained by the predictors in the model."
 }
 print("\nR^2 -Model 1 \n",interpretation)
-
-
-
-

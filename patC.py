@@ -18,11 +18,13 @@ df = df[cols]
 
 print("\nremaining_data after removal\n",remaining_data)
 # Prepare the predictors and response variables
-predictors = ['McycTime', 'minMaiMem', 'maxMaiMem', 'cachemem', 'minchan', 'maxchan', 'CacheCycleRatio']
-response = 'perfo'
+predictors = ['Log(McycTime)', 'Log(minMaiMem)', 'Log(maxMaiMem)', 'Log(cachemem)', 'Inv(Sqrt(minchan))', 'Log(maxchan)', 'Inv(Sq(CacheCycleRatio))']
+response = 'Inv(Sqrt(perfo))'
 X = remaining_data[predictors]
 y = remaining_data[response]
 from statsmodels.api import OLS, add_constant
+
+
 
 
 # Forward Selection with Marginality Principle Enforcement
@@ -280,8 +282,8 @@ print("\nselected_features_backward\n",selected_features_backward)
 # ,,,,,,,,,,,,,,,,,,,,,,,,,,............................................................................
 import matplotlib.pyplot as plt
 
-predictors_Model = ['McycTime', 'minMaiMem', 'maxMaiMem', 'cachemem', 'maxchan']
-response_Model = 'perfo'
+predictors_Model = ['Log(McycTime)', 'Log(minMaiMem)', 'Log(maxMaiMem)', 'Log(cachemem)', 'Log(maxchan)']
+response_Model = 'Inv(Sqrt(perfo))'
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -289,7 +291,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 remaining_data_Model = remaining_data[predictors_Model].copy()  # Ensure no SettingWithCopyWarning
-remaining_data_Model['perfo'] = remaining_data['perfo']
+remaining_data_Model['Inv(Sqrt(perfo))'] = remaining_data['Inv(Sqrt(perfo))']
 
 # assumption 1a residual vs fitted after
 # Step 2: Clean data (remove NaN or infinite values caused by transformations)
@@ -299,7 +301,7 @@ X_Model = transformed_data_clean_Model[predictors_Model]
 X_with_constant_Model = sm.add_constant(X_Model)
 
 # Fit the model using the already transformed and cleaned data
-y_transformed_Model = transformed_data_clean_Model['perfo']
+y_transformed_Model = transformed_data_clean_Model['Inv(Sqrt(perfo))']
 X_transformed_Model = transformed_data_clean_Model[predictors_Model]
 X_transformed_with_const_Model = sm.add_constant(X_transformed_Model)
 
@@ -411,8 +413,8 @@ sns.scatterplot(x=np.arange(len(cooks_d_Model)), y=cooks_d_Model, ax=axes1[0, 0]
 axes1[0, 0].axhline(y=cooks_d_threshold_Model, color='red', linestyle='--',
                     label=f"Threshold ({cooks_d_threshold_Model:.3f})")
 axes1[0, 0].set_title("Cook's Distance model 1",fontsize=16, fontweight='bold')
-axes1[0, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes1[0, 0].set_ylabel("Cook's Distance",fontsize=16, fontweight='bold')
+axes1[0, 0].set_xlabel('Index',fontsize=16)
+axes1[0, 0].set_ylabel("Cook's Distance",fontsize=16)
 axes1[0, 0].grid(True)
 axes1[0, 0].legend()
 
@@ -425,8 +427,8 @@ axes1[0, 1].axhline(y=std_residuals_threshold_Model, color='red', linestyle='--'
 axes1[0, 1].axhline(y=-std_residuals_threshold_Model, color='red', linestyle='--',
                     label=f"Lower Threshold (-{std_residuals_threshold_Model})")
 axes1[0, 1].set_title('Standardized Residuals model 1',fontsize=16, fontweight='bold')
-axes1[0, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes1[0, 1].set_ylabel('Standardized Residuals',fontsize=16, fontweight='bold')
+axes1[0, 1].set_xlabel('Index',fontsize=16)
+axes1[0, 1].set_ylabel('Standardized Residuals',fontsize=16)
 axes1[0, 1].grid(True)
 axes1[0, 1].legend(loc='lower right')
 
@@ -436,8 +438,8 @@ sns.scatterplot(x=np.arange(len(hat_values_Model)), y=hat_values_Model, ax=axes1
 axes1[1, 0].axhline(y=leverage_threshold_Model, color='orange', linestyle='--',
                     label=f"Threshold ({leverage_threshold_Model:.3f})")
 axes1[1, 0].set_title('Hat Values (Leverage) model 1',fontsize=16, fontweight='bold')
-axes1[1, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes1[1, 0].set_ylabel('Hat Values',fontsize=16, fontweight='bold')
+axes1[1, 0].set_xlabel('Index',fontsize=16)
+axes1[1, 0].set_ylabel('Hat Values',fontsize=16)
 axes1[1, 0].grid(True)
 axes1[1, 0].legend()
 
@@ -449,8 +451,8 @@ sns.scatterplot(x=np.arange(len(bonferroni_p_values_Model)), y=bonferroni_p_valu
                 color='purple')
 
 axes1[1, 1].set_title('Bonferroni p-values model 1',fontsize=16, fontweight='bold')
-axes1[1, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes1[1, 1].set_ylabel('Bonferroni p-value',fontsize=16, fontweight='bold')
+axes1[1, 1].set_xlabel('Index',fontsize=16)
+axes1[1, 1].set_ylabel('Bonferroni p-value',fontsize=16)
 axes1[1, 1].grid(True)
 plt.tight_layout()
 plt.show()
@@ -463,13 +465,13 @@ import matplotlib.pyplot as plt
 
 
 plt.figure(figsize=(18, 10))
-res = stats.probplot(remaining_data_Model['perfo'], dist="norm")
+res = stats.probplot(remaining_data_Model['Inv(Sqrt(perfo))'], dist="norm")
 # Plot the scatter points with 'x' markers
 plt.scatter(res[0][0], res[0][1], marker='x', color='purple', label='Data Points')
 # Plot the regression line in black
 plt.plot(res[0][0], res[1][0] * res[0][0] + res[1][1], color='black', label='Regression Line')
 # Customize titles and labels
-plt.title("QQ Plot for Transformed Response Variable (perfo) model 1", fontsize=16, fontweight='bold')
+plt.title("QQ Plot for Transformed Response Variable (Inv(Sqrt(perfo))) model 1", fontsize=16, fontweight='bold')
 plt.xlabel("Theoretical Quantiles", fontsize=16, fontweight='bold')
 plt.ylabel("Sample Quantiles", fontsize=16, fontweight='bold')
 # Add grid and legend
@@ -483,8 +485,8 @@ plt.show()
 
 # Plot a histogram for the transformed response variable 'perfo'
 plt.figure(figsize=(18, 10))
-plt.hist(remaining_data_Model['perfo'], color='purple',bins=15, edgecolor='black', alpha=0.7)
-plt.title("Histogram of Transformed Response Variable (perfo) model 1",fontsize=16, fontweight='bold')
+plt.hist(remaining_data_Model['Inv(Sqrt(perfo))'], color='purple',bins=15, edgecolor='black', alpha=0.7)
+plt.title("Histogram of Transformed Response Variable (Inv(Sqrt(perfo))) model 1",fontsize=16, fontweight='bold')
 plt.xlabel("Transformed perfo",fontsize=16, fontweight='bold')
 plt.ylabel("Frequency",fontsize=16, fontweight='bold')
 plt.grid(axis='y', alpha=0.75)

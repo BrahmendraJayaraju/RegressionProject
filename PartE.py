@@ -6,9 +6,19 @@ from partD import data
 import matplotlib.pyplot as plt
 
 # Define the response variable and predictors
-response = 'perfo'
-predictors = ['McycTime', 'minMaiMem', 'maxMaiMem', 'cachemem', 'maxchan']
-data = data
+remaining_data_Model = data.rename(columns={
+    "Log(McycTime)": "Log_McycTime",
+    "Log(minMaiMem)": "Log_minMaiMem",
+    "Log(maxMaiMem)": "Log_maxMaiMem",
+    "Log(cachemem)": "Log_cachemem",
+    "Log(maxchan)": "Log_maxchan",
+    "Inv(Sqrt(perfo))": "Inv_Sqrt_perfo"
+})
+response = 'Inv_Sqrt_perfo'
+predictors = ['Log_McycTime', 'Log_minMaiMem', 'Log_maxMaiMem', 'Log_cachemem', 'Log_maxchan']
+data = remaining_data_Model
+
+print(data)
 
 # Generate interaction terms and add to the dataset
 interaction_terms = []
@@ -82,8 +92,8 @@ print(vif_data)
 
 
 X_final = X_full[remaining_predictors]  # Subset the design matrix for final predictors
-columns_to_remove = ['McycTime_x_minMaiMem', 'minMaiMem_x_maxMaiMem', 'minMaiMem_x_maxchan', 'McycTime_x_maxchan',
-                     'cachemem_x_maxchan']
+columns_to_remove = ['Log_McycTime_x_Log_minMaiMem', 'Log_minMaiMem_x_Log_maxMaiMem', 'Log_minMaiMem_x_Log_maxchan', 'Log_McycTime_x_Log_maxchan',
+                     'Log_cachemem_x_Log_maxchan']
 X_final = X_final.drop(columns=columns_to_remove)
 print(X_final)
 
@@ -99,13 +109,13 @@ print(vif_data)
 X_final = data.copy()
 X_final['response'] = data[response]
 
-predictors = ['minMaiMem', 'maxMaiMem', 'maxchan', 'McycTime_x_maxMaiMem', 'McycTime_x_cachemem']
+predictors = ['Log_minMaiMem', 'Log_maxMaiMem', 'Log_maxchan', 'Log_McycTime_x_Log_maxMaiMem', 'Log_McycTime_x_Log_cachemem']
 X = X_final[predictors]
 
 transformed_data_clean_2model = X_final.replace([np.inf, -np.inf], np.nan).dropna()
 X_with_constant = sm.add_constant(X)
 # Fit the model using the already transformed and cleaned data
-y_transformed = transformed_data_clean_2model['perfo']
+y_transformed = transformed_data_clean_2model['Inv_Sqrt_perfo']
 X_transformed = transformed_data_clean_2model[predictors]
 X_transformed_with_const = sm.add_constant(X_transformed)
 
@@ -216,8 +226,8 @@ fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 sns.scatterplot(x=np.arange(len(cooks_d)), y=cooks_d, ax=axes[0, 0], color='blue')
 axes[0, 0].axhline(y=cooks_d_threshold, color='red', linestyle='--', label=f"Threshold ({cooks_d_threshold:.3f})")
 axes[0, 0].set_title("Cook's Distance -Model 2 ",fontsize=16, fontweight='bold')
-axes[0, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[0, 0].set_ylabel("Cook's Distance",fontsize=16, fontweight='bold')
+axes[0, 0].set_xlabel('Index',fontsize=16)
+axes[0, 0].set_ylabel("Cook's Distance",fontsize=16)
 axes[0, 0].grid(True)
 axes[0, 0].legend()
 
@@ -229,8 +239,8 @@ axes[0, 1].axhline(y=std_residuals_threshold, color='red', linestyle='--',
 axes[0, 1].axhline(y=-std_residuals_threshold, color='red', linestyle='--',
                    label=f"Lower Threshold (-{std_residuals_threshold})")
 axes[0, 1].set_title('Standardized Residuals -Model 2',fontsize=16, fontweight='bold')
-axes[0, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[0, 1].set_ylabel('Standardized Residuals',fontsize=16, fontweight='bold')
+axes[0, 1].set_xlabel('Index',fontsize=16)
+axes[0, 1].set_ylabel('Standardized Residuals',fontsize=16)
 axes[0, 1].grid(True)
 axes[0, 1].legend(loc='lower right')
 
@@ -239,8 +249,8 @@ hat_values = influence.hat_matrix_diag
 sns.scatterplot(x=np.arange(len(hat_values)), y=hat_values, ax=axes[1, 0], color='orange')
 axes[1, 0].axhline(y=leverage_threshold, color='red', linestyle='--', label=f"Threshold ({leverage_threshold:.3f})")
 axes[1, 0].set_title('Hat Values (Leverage) -Model 2',fontsize=16, fontweight='bold')
-axes[1, 0].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[1, 0].set_ylabel('Hat Values',fontsize=16, fontweight='bold')
+axes[1, 0].set_xlabel('Index',fontsize=16)
+axes[1, 0].set_ylabel('Hat Values',fontsize=16)
 axes[1, 0].grid(True)
 axes[1, 0].legend()
 
@@ -251,8 +261,8 @@ bonferroni_p_values = p_values
 sns.scatterplot(x=np.arange(len(bonferroni_p_values)), y=bonferroni_p_values, ax=axes[1, 1], color='purple')
 
 axes[1, 1].set_title('Bonferroni p-values -Model 2',fontsize=16, fontweight='bold')
-axes[1, 1].set_xlabel('Index',fontsize=16, fontweight='bold')
-axes[1, 1].set_ylabel('Bonferroni p-value',fontsize=16, fontweight='bold')
+axes[1, 1].set_xlabel('Index',fontsize=16)
+axes[1, 1].set_ylabel('Bonferroni p-value',fontsize=16)
 axes[1, 1].grid(True)
 plt.tight_layout()
 plt.show()
@@ -267,13 +277,13 @@ import matplotlib.pyplot as plt
 
 
 plt.figure(figsize=(18, 10))
-res = stats.probplot(transformed_data_clean_2model['perfo'], dist="norm")
+res = stats.probplot(transformed_data_clean_2model['Inv_Sqrt_perfo'], dist="norm")
 # Plot the scatter points with 'x' markers
 plt.scatter(res[0][0], res[0][1], marker='x', color='purple', label='Data Points')
 # Plot the regression line in black
 plt.plot(res[0][0], res[1][0] * res[0][0] + res[1][1], color='black', label='Regression Line')
 # Customize titles and labels
-plt.title("QQ Plot for Transformed Response Variable (perfo) -Model 2 ",fontsize=16, fontweight='bold')
+plt.title("QQ Plot for Transformed Response Variable (Inv_Sqrt_perfo) -Model 2 ",fontsize=16, fontweight='bold')
 plt.xlabel("Theoretical Quantiles", fontsize=16, fontweight='bold')
 plt.ylabel("Sample Quantiles", fontsize=16, fontweight='bold')
 # Add grid and legend
@@ -291,8 +301,8 @@ plt.show()
 
 # Plot a histogram for the transformed response variable 'perfo'
 plt.figure(figsize=(18, 10))
-plt.hist(transformed_data_clean_2model['perfo'], bins=15, color='purple',edgecolor='black', alpha=0.7)
-plt.title("Histogram of Transformed Response Variable (perfo) -Model 2 ",fontsize=16, fontweight='bold')
+plt.hist(transformed_data_clean_2model['Inv_Sqrt_perfo'], bins=15, color='purple',edgecolor='black', alpha=0.7)
+plt.title("Histogram of Transformed Response Variable (Inv_Sqrt_perfo) -Model 2 ",fontsize=16, fontweight='bold')
 plt.xlabel("Transformed perfo",fontsize=16, fontweight='bold')
 plt.ylabel("Frequency",fontsize=16, fontweight='bold')
 plt.grid(axis='y', alpha=0.75)
@@ -305,8 +315,8 @@ plt.show()
 
 #Anova
 data =transformed_data_clean_2model
-response = 'perfo'
-predictors = ['minMaiMem', 'maxMaiMem', 'maxchan', 'McycTime_x_maxMaiMem', 'McycTime_x_cachemem']
+response = 'Inv_Sqrt_perfo'
+predictors = ['Log_minMaiMem', 'Log_maxMaiMem', 'Log_maxchan', 'Log_McycTime_x_Log_maxMaiMem', 'Log_McycTime_x_Log_cachemem']
 # Construct the formula for regression
 formula = f"{response} ~ {' + '.join(predictors)}"
 import statsmodels.formula.api as smf
@@ -340,8 +350,8 @@ axes = axes.flatten()
 for i, predictor in enumerate(predictors):
     sm.graphics.plot_ccpr(model, predictor, ax=axes[i])
     axes[i].set_title(f"Effect Plot for {predictor} -Model 2",fontsize=16, fontweight='bold')
-    axes[i].set_xlabel(predictor,fontsize=16, fontweight='bold')
-    axes[i].set_ylabel(response,fontsize=16, fontweight='bold')
+    axes[i].set_xlabel(predictor,fontsize=16)
+    axes[i].set_ylabel(response,fontsize=16)
 
 # Turn off unused subplots
 for j in range(len(predictors), len(axes)):
